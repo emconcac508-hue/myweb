@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Blox Fruits Shop</title>
+
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+h1{
+margin-top:30px;
+color:#38bdf8;
+}
+
+.shop{
+display:flex;
+justify-content:center;
+gap:30px;
+margin-top:40px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+width:200px;
+box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+.card img{
+width:100%;
+border-radius:8px;
+}
+
+button{
+margin-top:10px;
+padding:10px;
+width:100%;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#16a34a;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Blox Fruits Shop</h1>
+<p>Chọn trái ác quỷ bạn muốn mua</p>
+
+<div class="shop">
+
+<div class="card">
+<img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/3/3f/LightFruit.png">
+<h3>Light Fruit</h3>
+<p>Price: 500 Robux</p>
+<button onclick="buy('Light Fruit')">Mua</button>
+</div>
+
+<div class="card">
+<img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/0/0d/DoughFruit.png">
+<h3>Dough Fruit</h3>
+<p>Price: 1200 Robux</p>
+<button onclick="buy('Dough Fruit')">Mua</button>
+</div>
+
+<div class="card">
+<img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/7/7f/DragonFruit.png">
+<h3>Dragon Fruit</h3>
+<p>Price: 2000 Robux</p>
+<button onclick="buy('Dragon Fruit')">Mua</button>
+</div>
+
+</div>
+
+<script>
+function buy(item){
+alert("Bạn đã chọn mua: " + item);
+}
+</script>
+
+</body>
+</html>
