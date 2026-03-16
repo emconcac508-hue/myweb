@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>DKhang Shop</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f2f2f2;
+}
+
+/* LOGIN */
+
+.login{
+width:350px;
+background:white;
+padding:30px;
+border-radius:8px;
+margin:120px auto;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+.login input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:1px solid #ddd;
+border-radius:5px;
+}
+
+.login button{
+margin-top:10px;
+padding:10px;
+width:100%;
+background:#e31b1b;
+border:none;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* SHOP */
+
+.shop{
+display:none;
+}
+
+header{
+background:white;
+padding:15px;
+font-size:22px;
+font-weight:bold;
+box-shadow:0 0 5px rgba(0,0,0,0.2);
+}
+
+.container{
+display:flex;
+}
+
+.sidebar{
+width:250px;
+background:white;
+padding:20px;
+border-right:1px solid #ddd;
+}
+
+.menu{
+margin-top:20px;
+}
+
+.menu div{
+padding:12px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+}
+
+.menu div.active{
+background:#e31b1b;
+color:white;
+}
+
+.content{
+flex:1;
+padding:30px;
+}
+
+.page{
+display:none;
+}
+
+.box{
+background:white;
+padding:25px;
+border-radius:8px;
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #ddd;
+border-radius:5px;
+}
+
+button{
+background:#e31b1b;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.notice{
+color:#e31b1b;
+margin-bottom:15px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:30px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#eee;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div class="login" id="login">
+
+<h2>DKhang Shop</h2>
+
+<input id="user" placeholder="Tên đăng nhập">
+<input id="pass" type="password" placeholder="Mật khẩu">
+
+<button onclick="login()">Đăng nhập</button>
+<button onclick="register()">Đăng ký</button>
+
+</div>
+
+
+<!-- SHOP -->
+
+<div class="shop" id="shop">
+
+<header>
+DKhang Shop - Cày Thuê Blox Fruit
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+
+<img src="https://tr.rbxcdn.com/180DAY-cc8c0a81a8e6a4e1c3e9e3cbbf2e1c91/150/150/AvatarHeadshot/Png">
+
+<div class="menu">
+
+<div onclick="showPage('account')">Thông Tin Tài Khoản</div>
+<div onclick="showPage('napthe')">Nạp Thẻ</div>
+<div onclick="showPage('rutrobux')">Rút Robux</div>
+<div onclick="showPage('lichsu')">Lịch sử</div>
+<div onclick="showPage('taikhoan')">Tài Khoản Đã Mua</div>
+<div onclick="showPage('setting')">Setting</div>
+
+</div>
+
+</div>
+
+<div class="content">
+
+<!-- Thông tin -->
+
+<div id="account" class="page">
+
+<div class="box">
+
+<div class="notice">
+Chọn gói dịch vụ
+</div>
+
+<h3>Tùy Chọn Gói Mua</h3>
+
+<select>
+<option>Chọn gói</option>
+<option>Cày Tim Levi</option>
+<option>Draco V1</option>
+<option>Draco V4</option>
+<option>Up Tộc V4</option>
+<option>Cày Beli</option>
+</select>
+
+<h3>Điền Thông Tin Mua</h3>
+
+<label>Tên Đăng Nhập Nick Roblox</label>
+<input placeholder="Nhập tên roblox">
+
+<label>Mật Khẩu Đăng Nhập Nick Roblox</label>
+<input type="password" placeholder="Nhập mật khẩu">
+
+<label>Ghi Chú</label>
+<textarea placeholder="Nhập ghi chú"></textarea>
+
+<label>Mã Giảm Giá</label>
+<input placeholder="Nhập mã nếu có">
+
+<button>Đặt ngay</button>
+
+</div>
+
+</div>
+
+<!-- Nạp thẻ -->
+
+<div id="napthe" class="page">
+
+<div class="box">
+
+<h3>Nạp Thẻ</h3>
+
+<input placeholder="Nhập mã thẻ">
+<button>Nạp</button>
+
+</div>
+
+</div>
+
+<!-- Rút robux -->
+
+<div id="rutrobux" class="page">
+
+<div class="box">
+
+<h3>Rút Robux</h3>
+
+<input placeholder="Nhập số robux">
+<button>Rút</button>
+
+</div>
+
+</div>
+
+<!-- Lịch sử -->
+
+<div id="lichsu" class="page">
+
+<h3>Lịch Sử Đơn Cày Thuê</h3>
+
+<table>
+
+<tr>
+<th>STT</th>
+<th>Gói</th>
+<th>Trạng thái</th>
+<th>Username</th>
+<th>Note</th>
+<th>Thời gian</th>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Cày Levi</td>
+<td>Đang xử lý</td>
+<td>RobloxUser</td>
+<td>-</td>
+<td>20/3</td>
+</tr>
+
+</table>
+
+</div>
+
+<!-- Tài khoản đã mua -->
+
+<div id="taikhoan" class="page">
+
+<div class="box">
+
+<h3>Tài Khoản Đã Mua</h3>
+
+<p>Chưa có tài khoản</p>
+
+</div>
+
+</div>
+
+<!-- Setting -->
+
+<div id="setting" class="page">
+
+<div class="box">
+
+<h3>Setting Tài Khoản</h3>
+
+<p>Tài khoản đang đăng nhập: <b id="currentUser"></b></p>
+
+<button onclick="logout()">Thoát tài khoản</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showPage(page){
+
+var pages=document.getElementsByClassName("page");
+
+for(var i=0;i<pages.length;i++){
+pages[i].style.display="none";
+}
+
+document.getElementById(page).style.display="block";
+
+}
+
+function register(){
+
+var user=document.getElementById("user").value;
+var pass=document.getElementById("pass").value;
+
+if(user==""||pass==""){
+alert("Vui lòng nhập tài khoản và mật khẩu");
+return;
+}
+
+localStorage.setItem("user",user);
+localStorage.setItem("pass",pass);
+
+alert("Đăng ký thành công! Hãy đăng nhập lại.");
+
+document.getElementById("user").value="";
+document.getElementById("pass").value="";
+
+}
+
+function login(){
+
+var user=document.getElementById("user").value;
+var pass=document.getElementById("pass").value;
+
+var savedUser=localStorage.getItem("user");
+var savedPass=localStorage.getItem("pass");
+
+if(user===savedUser && pass===savedPass){
+
+document.getElementById("login").style.display="none";
+document.getElementById("shop").style.display="block";
+
+document.getElementById("currentUser").innerText=user;
+
+showPage("account");
+
+}else{
+
+alert("Sai tên đăng nhập hoặc mật khẩu");
+
+}
+
+}
+
+function logout(){
+
+document.getElementById("shop").style.display="none";
+document.getElementById("login").style.display="block";
+
+}
+
+</script>
+
+</body>
+</html>
