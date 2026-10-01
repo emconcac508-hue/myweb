@@ -1,395 +1,601 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>DKhang Shop</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SentinelJar 4.0</title>
+<script>window.tsReady=function(){window.tsOK=1;if(window.initTs)initTs()}</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=tsReady" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="/jar-viewer.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
+:root{--bg:#04060d;--ink:#e8ecf8;--mute:#8d97b5;--line:rgba(255,255,255,.12);--glass:rgba(14,18,34,.55);--acc:#ff9d3c;--acc2:#5ab4ff;--bad:#ff5d6c;--warn:#ffc14d;--ok:#4ade9b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.55 Sora,system-ui,sans-serif;overflow-x:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+main{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:flex-start;padding:24px clamp(16px,6vw,96px)}
+.wrap{width:min(440px,100%)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand svg{width:44px;height:44px;filter:drop-shadow(0 0 14px rgba(255,157,60,.55))}
+.brand h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(90deg,#fff,#ffd9a8 60%,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ver{font:600 12px "JetBrains Mono",monospace;border:1px solid var(--acc);color:var(--acc);border-radius:99px;padding:2px 9px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:26px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.06);border-radius:12px;padding:4px;margin-bottom:20px;position:relative}
+.tabs button{background:none;border:0;color:var(--mute);font:600 14px Sora,sans-serif;padding:10px;border-radius:9px;cursor:pointer;position:relative;z-index:1;transition:color .25s}
+.tabs button.on{color:#14100a}
+.pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--acc);border-radius:9px;transition:transform .3s cubic-bezier(.5,0,.2,1)}
+.tabs[data-t="1"] .pill{transform:translateX(100%)}
+label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px}
+input[type=text],input[type=password],input[type=email]{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:15px Sora,sans-serif;padding:12px 14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,157,60,.2)}
+.btn{width:100%;margin-top:20px;border:0;border-radius:12px;padding:13px;font:700 15px Sora,sans-serif;color:#14100a;background:linear-gradient(90deg,var(--acc),#ffc27a);cursor:pointer;transition:transform .15s,filter .2s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);width:auto;margin:0;padding:8px 14px;font-size:13px}
+button:focus-visible,input:focus-visible,.drop:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.msg{min-height:20px;margin-top:12px;font-size:13px;color:var(--bad)}
+.hide{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.top span{color:var(--mute);font-size:13px}
+.drop{border:1.5px dashed rgba(255,157,60,.55);border-radius:16px;padding:34px 16px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s}
+.drop:hover,.drop.over{background:rgba(255,157,60,.08);border-color:var(--acc)}
+.drop b{display:block;font-size:16px}.drop small{color:var(--mute)}
+#appWrap{width:min(720px,100%)}
+.score{display:flex;align-items:center;gap:18px;margin:6px 0 16px}
+.ring{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font:800 24px Sora;background:conic-gradient(var(--c,var(--ok)) calc(var(--p,0)*1%),rgba(255,255,255,.08) 0)}
+.ring i{font-style:normal;width:68px;height:68px;border-radius:50%;background:#0b0f1d;display:grid;place-items:center}
+.score h3{margin:0;font-size:19px}.score p{margin:2px 0 0;color:var(--mute);font-size:13px}
+.list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow:auto}
+.f{border-left:3px solid var(--c);background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px}
+.f b{font-size:14px}.f div{font:12px "JetBrains Mono",monospace;color:var(--mute);word-break:break-all}
+.pr{height:4px;border-radius:9px;background:rgba(255,255,255,.1);margin-top:14px;overflow:hidden}.pr i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+@media(max-width:760px){main{align-items:flex-end;justify-content:center}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
-body{
-font-family:Arial;
-margin:0;
-background:#f2f2f2;
-}
+#hdr{position:fixed;top:0;left:0;right:0;height:60px;padding:env(safe-area-inset-top,0px) 22px 0;display:flex;justify-content:space-between;align-items:center;background:rgba(6,9,20,.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:5}
+#hdr .brand{margin:0}#hdr .brand svg{width:30px;height:30px}#hdr .brand h1{font-size:20px}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.chip{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.05)}
+.chip i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;box-shadow:0 0 8px var(--ok)}
+#pages{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:92px 20px 190px}
+.pg{display:none}.pg.on{display:block}
+.pg h2{font-size:clamp(24px,4vw,36px);letter-spacing:-.02em;margin:0 0 8px}
+.pg>p.sub{color:var(--mute);margin:0 0 22px;max-width:60ch}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:26px 0 54px}
+.fc{background:rgba(14,18,34,.72);border:1px solid var(--line);border-radius:16px;padding:20px}
+.fc em{font-style:normal;font-size:26px}.fc h3{margin:8px 0 6px;font-size:17px}.fc p{margin:0;color:var(--mute);font-size:13px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:22px}
+.pc{position:relative;background:rgba(14,18,34,.72);border:1px solid var(--line);border-radius:18px;padding:24px}
+.pc.hot{border-color:#8f7bff;box-shadow:0 0 30px rgba(143,123,255,.25)}
+.pc .bd{position:absolute;top:-10px;right:18px;background:#8f7bff;color:#fff;font:700 11px Sora;border-radius:99px;padding:3px 10px}
+.pc h3{margin:0 0 6px}.pc .pr2{font-size:34px;font-weight:800}.pc .pr2 small{font-size:18px;color:var(--mute);font-weight:600}
+.pc ul{list-style:none;padding:0;margin:16px 0 0;font-size:14px}.pc li{padding:3px 0}.pc li.y::before{content:"✓ ";color:var(--ok)}.pc li.n::before{content:"✕ ";color:var(--bad)}.pc li.n{color:var(--mute)}
+.ctr{text-align:center}.cta{display:inline-block;width:auto;padding:13px 26px;margin:30px 0 20px}
+.foot{text-align:center;color:var(--mute);font-size:13px}
+.pnl{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.lock{text-align:center;padding:30px 10px;color:var(--mute)}.lock b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+.src{display:grid;grid-template-columns:240px 1fr;gap:14px}
+.cls{max-height:380px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.cls button{background:none;border:0;text-align:left;color:var(--mute);font:12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;cursor:pointer;word-break:break-all}
+.cls button:hover,.cls button.on{background:rgba(255,157,60,.14);color:var(--ink)}
+pre#code{margin:0;max-height:380px;overflow:auto;font:12px/1.6 "JetBrains Mono",monospace;background:rgba(0,0,0,.35);border-radius:12px;padding:12px;white-space:pre-wrap;word-break:break-all}
+pre#code .dg{color:var(--bad)}pre#code .wn{color:var(--warn)}
+#chat{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;margin-bottom:12px}
+.bb{padding:10px 14px;border-radius:14px;max-width:88%;white-space:pre-line;word-break:break-word;font-size:14px}
+.bb.u{align-self:flex-end;background:var(--acc);color:#14100a}.bb.b{background:rgba(255,255,255,.08)}
+.row{display:flex;gap:8px}.row input{flex:1}.row .btn{width:auto;margin:0;padding:0 20px}
+select{background:rgba(255,255,255,.06);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:11px;font:14px Sora}
+select option{color:#111}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:14px}.kv span{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}td,th{padding:8px;border-bottom:1px solid var(--line);text-align:left}
+.ok{color:var(--ok)}
+#dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(36px + env(safe-area-inset-bottom,0px));display:flex;gap:2px;padding:8px;border-radius:26px;background:rgba(10,14,28,.78);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:6;touch-action:none;max-width:96vw}
+#dock button{background:none;border:1px solid transparent;border-radius:20px;color:var(--mute);width:78px;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 11px Sora,sans-serif;cursor:pointer;transition:all .25s}
+#dock button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#dock button.on{color:#fff;border-color:var(--acc);background:rgba(255,157,60,.14);box-shadow:0 0 18px rgba(255,157,60,.4)}
+#hint{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;color:var(--mute);z-index:6}
+#pl{position:fixed;left:18px;bottom:calc(100px + env(safe-area-inset-bottom,0px));width:270px;padding:16px;border-radius:18px;background:rgba(10,14,28,.8);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:6}
+#pl b{display:block}#pl small{color:var(--mute);font-size:12px}
+#pl input[type=range]{width:100%;accent-color:var(--acc2);margin:6px 0}
+.ctl{display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px}
+.ctl button{background:none;border:0;color:var(--acc2);font-size:17px;cursor:pointer;width:36px;height:36px;border-radius:50%}
+.ctl button.on{background:rgba(90,180,255,.2)}.ctl #pp{background:linear-gradient(135deg,#8f7bff,var(--acc2));color:#fff;width:44px;height:44px}
+#orb{position:fixed;left:20px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;z-index:6;background:conic-gradient(var(--acc2) 0 30%,rgba(255,255,255,.1) 0);-webkit-mask:radial-gradient(circle,transparent 20px,#000 21px);mask:radial-gradient(circle,transparent 20px,#000 21px);animation:sp 3s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:1180px){#pl,#orb{display:none}}
+@media(max-width:700px){.src{grid-template-columns:1fr}#dock button{width:46px}#dock button span{display:none}#hdr .chip:not(:last-child){display:none}}
 
-/* LOGIN */
-
-.login{
-width:350px;
-background:white;
-padding:30px;
-border-radius:8px;
-margin:120px auto;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-text-align:center;
-}
-
-.login input{
-width:100%;
-padding:10px;
-margin-top:10px;
-border:1px solid #ddd;
-border-radius:5px;
-}
-
-.login button{
-margin-top:10px;
-padding:10px;
-width:100%;
-background:#e31b1b;
-border:none;
-color:white;
-border-radius:5px;
-cursor:pointer;
-}
-
-/* SHOP */
-
-.shop{
-display:none;
-}
-
-header{
-background:white;
-padding:15px;
-font-size:22px;
-font-weight:bold;
-box-shadow:0 0 5px rgba(0,0,0,0.2);
-}
-
-.container{
-display:flex;
-}
-
-.sidebar{
-width:250px;
-background:white;
-padding:20px;
-border-right:1px solid #ddd;
-}
-
-.menu{
-margin-top:20px;
-}
-
-.menu div{
-padding:12px;
-border-bottom:1px solid #eee;
-cursor:pointer;
-}
-
-.menu div.active{
-background:#e31b1b;
-color:white;
-}
-
-.content{
-flex:1;
-padding:30px;
-}
-
-.page{
-display:none;
-}
-
-.box{
-background:white;
-padding:25px;
-border-radius:8px;
-}
-
-input,select,textarea{
-width:100%;
-padding:10px;
-margin-top:5px;
-margin-bottom:15px;
-border:1px solid #ddd;
-border-radius:5px;
-}
-
-button{
-background:#e31b1b;
-color:white;
-border:none;
-padding:12px 20px;
-border-radius:5px;
-cursor:pointer;
-}
-
-.notice{
-color:#e31b1b;
-margin-bottom:15px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:30px;
-}
-
-th,td{
-border:1px solid #ddd;
-padding:10px;
-text-align:center;
-}
-
-th{
-background:#eee;
-}
-
+button.chip{color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.fc,.pc{position:relative;transition:transform .25s,border-color .25s,box-shadow .25s}
+.fc::after,.pc::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(255,157,60,.2),transparent 62%)}
+.fc:hover,.pc:hover{transform:translateY(-6px) perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));border-color:var(--acc);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.fc:hover::after,.pc:hover::after{opacity:1}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,157,60,.35)}
+.pg.in{animation:pgIn .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes pgIn{from{opacity:0;transform:translateX(var(--dx,60px)) scale(.97);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+#dock button{position:relative;z-index:1}
+#dock button.on{background:none;border-color:transparent;box-shadow:none}
+#dock button:hover{color:#fff;transform:translateY(-4px)}
+#dock button svg{transition:transform .25s}#dock button:hover svg{transform:scale(1.2) rotate(-6deg)}
+#ind{position:absolute;top:8px;bottom:8px;left:0;width:78px;border-radius:20px;background:rgba(255,157,60,.16);border:1px solid var(--acc);box-shadow:0 0 22px rgba(255,157,60,.45);transition:transform .45s cubic-bezier(.3,1.4,.5,1),width .3s;pointer-events:none}
+#cg{position:fixed;left:0;top:0;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;background:radial-gradient(circle,rgba(255,157,60,.13),transparent 65%);pointer-events:none;z-index:0;transition:opacity .3s}
+@media(hover:none){#cg{display:none}}
+@media(prefers-reduced-motion:reduce){.pg.in{animation:none}#ind{transition:none}}
+.ts{margin-top:16px}.ts:empty{display:none}
+#gate{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(4,6,13,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.otp{display:flex;gap:8px;margin:18px 0}
+.otp input[type=text]{min-width:0;text-align:center;font:700 24px "JetBrains Mono",monospace;padding:12px 0}
+.lnk{background:none;border:0;color:var(--acc2);cursor:pointer;font:inherit;font-size:13px;padding:6px 2px}.lnk:disabled{color:var(--mute);cursor:default}
+.tip{display:flex;gap:10px;margin-top:14px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;color:var(--ink);background:rgba(255,193,77,.1);border:1px solid rgba(255,193,77,.45)}.tip b{color:var(--warn)}
+#toasts{position:fixed;top:calc(72px + env(safe-area-inset-top,0px));right:18px;z-index:8;display:flex;flex-direction:column;gap:10px;width:min(330px,calc(100vw - 36px));pointer-events:none}
+.ts{pointer-events:auto;display:flex;gap:10px;align-items:flex-start;padding:12px 12px 12px 14px;border-radius:14px;background:rgba(14,18,34,.88);border:1px solid var(--line);border-left:3px solid var(--acc);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 12px 34px rgba(0,0,0,.45);font-size:13px;line-height:1.5;animation:tsin .4s cubic-bezier(.3,1.3,.5,1);transition:opacity .25s,transform .25s}
+.ts.ok{border-left-color:var(--ok)}.ts.bad{border-left-color:var(--bad)}
+.ts.out{opacity:0;transform:translateX(26px)}
+.ts .tx{flex:1}.ts>button{background:none;border:0;color:var(--mute);font-size:18px;line-height:1;cursor:pointer;padding:0 4px}.ts>button:hover{color:var(--ink)}
+.ts .lnk{padding:4px 0 0}
+@keyframes tsin{from{opacity:0;transform:translateX(34px)}}
+@media(prefers-reduced-motion:reduce){.ts{animation:none;transition:none}}
+.qs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 </style>
 </head>
-
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9a8"/><stop offset="1" stop-color="#ff9d3c"/></linearGradient></defs></svg>
+<div id="cg" aria-hidden="true"></div>
+<div id="gate" class="hide" role="dialog" aria-label="Xác minh Cloudflare">
+  <div class="card" style="width:min(420px,100%);text-align:center">
+    <div class="brand" style="justify-content:center"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3 6 10v12c0 11 7.5 19.5 18 23 10.500-3.500 18-12 18-23V10z" fill="none" stroke="url(#g)" stroke-width="2.5" stroke-linejoin="round"/><path d="M15 24.500l6.500 6.500L33 18" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>SentinelJar</h1></div>
+    <h2 style="margin:0 0 6px;font-size:19px">Đang kiểm tra bạn là người thật</h2>
+    <p style="margin:0 0 18px;color:var(--mute);font-size:14px">Cloudflare xác minh trình duyệt của bạn trước khi vào trang.</p>
+    <div id="gateTs" style="display:flex;justify-content:center;min-height:65px"></div>
+    <div class="msg" id="gmsg" role="alert"></div>
+  </div>
+</div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<main id="mainAuth">
+<div class="wrap" id="authWrap">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3 6 10v12c0 11 7.5 19.5 18 23 10.500-3.500 18-12 18-23V10z" fill="none" stroke="url(#g)" stroke-width="2.5" stroke-linejoin="round"/><path d="M15 24.500l6.500 6.500L33 18" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>SentinelJar</h1><span class="ver">4.0</span>
+  </div>
+  <div class="card">
+    <div class="tabs" id="tabs" data-t="0"><div class="pill"></div>
+      <button class="on" data-i="0" type="button">Đăng nhập</button><button data-i="1" type="button">Đăng ký</button></div>
+    <div id="fLogin">
+      <label for="lu">Tên đăng nhập</label><input id="lu" type="text" autocomplete="username">
+      <label for="lp">Mật khẩu</label><input id="lp" type="password" autocomplete="current-password">
+      <button class="btn" id="bLogin" type="button">Đăng nhập</button>
+    </div>
+    <div id="fReg" class="hide">
+      <label for="ru">Tên đăng nhập</label><input id="ru" type="text" autocomplete="username">
+      <label for="re">Email</label><input id="re" type="email" autocomplete="email">
+      <label for="rp">Mật khẩu (từ 6 ký tự)</label><input id="rp" type="password" autocomplete="new-password">
+      <label for="rp2">Nhập lại mật khẩu</label><input id="rp2" type="password" autocomplete="new-password">
+      <button class="btn" id="bReg" type="button">Tạo tài khoản</button>
+    </div>
+    <div id="fOtp" class="hide">
+      <h2 style="margin:0 0 6px;font-size:20px">Nhập mã xác minh</h2>
+      <p style="margin:0;color:var(--mute);font-size:14px">Mình đã gửi mã 6 số tới <b id="otpTo" style="color:var(--ink)"></b>. Mã có hiệu lực 10 phút.</p>
+      <div class="tip" id="otpTip" role="note"><span aria-hidden="true">📬</span><div><b><span id="tipPre"></span>Chưa thấy email?</b> Hãy kiểm tra mục <b>Spam (Thư rác)</b> và <b>Quảng cáo (Promotions)</b> trong Gmail. Email có tiêu đề "… là mã xác minh SentinelJar của bạn". Nếu nằm trong Spam, bấm <b>Không phải spam</b> để lần sau vào thẳng hộp thư.</div></div>
+      <div class="otp" id="otpBoxes"><input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Số 1"><input type="text" inputmode="numeric" maxlength="1" aria-label="Số 2"><input type="text" inputmode="numeric" maxlength="1" aria-label="Số 3"><input type="text" inputmode="numeric" maxlength="1" aria-label="Số 4"><input type="text" inputmode="numeric" maxlength="1" aria-label="Số 5"><input type="text" inputmode="numeric" maxlength="1" aria-label="Số 6"></div>
+      <button class="btn" id="bOtp" type="button" style="margin-top:0">Xác minh</button>
+      <div style="display:flex;justify-content:space-between;margin-top:10px"><button class="lnk" id="bBack" type="button">← Đổi email</button><button class="lnk" id="bResend" type="button" disabled>Gửi lại mã</button></div>
+    </div>
+    <div class="msg" id="msg" role="alert"></div>
+  </div>
+</div>
 
-<!-- LOGIN -->
+</main>
+<div id="app" class="hide">
+ <header id="hdr">
+  <div class="brand"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3 6 10v12c0 11 7.5 19.5 18 23 10.500-3.500 18-12 18-23V10z" fill="none" stroke="url(#g)" stroke-width="2.5" stroke-linejoin="round"/><path d="M15 24.500l6.500 6.500L33 18" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>SentinelJar</h1><span class="ver">4.0</span></div>
+  <div class="chips"><span class="chip"><i></i>Online</span><button class="chip" id="snd" type="button" aria-label="Bật/tắt âm thanh">🔊</button><span class="chip" id="plan"></span><span class="chip" id="who"></span></div>
+ </header>
+ <div id="pages">
+  <section class="pg" id="pg-home">
+   <h2>Soi file .jar trước khi bạn chạy nó</h2>
+   <p class="sub">Phát hiện webhook đánh cắp dữ liệu, code tải từ xa và lệnh hệ thống ẩn trong mod, plugin hay launcher. Mọi thứ chạy ngay trên trình duyệt của bạn.</p>
+   <div class="grid4">
+    <div class="fc"><em>🔎</em><h3>JAR Scanner</h3><p>Điểm rủi ro 0–100, class đáng ngờ, URL, file exe/script ẩn. Quét ngay trên trình duyệt.</p></div>
+    <div class="fc"><em>📜</em><h3>Mã nguồn CFR</h3><p>Xem chuỗi và tham chiếu nguy hiểm trong từng class, tô đỏ dòng đáng ngờ.</p></div>
+    <div class="fc"><em>🤖</em><h3>Bot hỏi Key</h3><p>Hỏi "key/webhook của file này ở đâu?" và nhận câu trả lời kèm vị trí.</p></div>
+    <div class="fc"><em>📤</em><h3>Báo cáo JSON</h3><p>Xuất toàn bộ kết quả phân tích để lưu hoặc chia sẻ.</p></div>
+   </div>
+   <h2 class="ctr">Các gói dịch vụ</h2><p class="sub ctr" style="margin:0 auto">Cần license key để dùng đầy đủ. Liên hệ admin để nhận key.</p>
+   <div class="plans">
+    <div class="pc"><h3>Basic</h3><div class="pr2">49k<small>/tháng</small></div><ul><li class="y">JAR Scanner không giới hạn</li><li class="y">Bot hỏi Key</li><li class="n">Mã nguồn CFR</li><li class="n">Xuất báo cáo JSON</li></ul></div>
+    <div class="pc hot"><span class="bd">PHỔ BIẾN</span><h3>Pro</h3><div class="pr2">99k<small>/tháng</small></div><ul><li class="y">Mọi thứ trong Basic</li><li class="y">Mã nguồn CFR</li><li class="y">Tô đỏ dòng nguy hiểm</li><li class="n">Xuất báo cáo JSON</li></ul></div>
+    <div class="pc"><h3>Elite</h3><div class="pr2">249k<small>/tháng</small></div><ul><li class="y">Mọi thứ trong Pro</li><li class="y">Xuất báo cáo JSON</li><li class="y">Hỗ trợ ưu tiên</li></ul></div>
+   </div>
+   <div class="ctr"><button class="btn cta" data-go="key" type="button">🔑 Đã có key? Kích hoạt ngay</button></div>
+   <p class="foot">© 2026 SentinelJar · Kết quả mang tính heuristic, không thay thế antivirus hay phân tích thủ công.</p>
+  </section>
 
-<div class="login" id="login">
+  <section class="pg" id="pg-scan">
+   <h2>JAR Scanner</h2><p class="sub">Kéo thả file .jar. File được quét ngay trên máy bạn, không tải lên đâu cả.</p>
+   <div class="pnl">
+    <div class="drop" id="drop" tabindex="0" role="button"><b>Kéo thả file .jar vào đây</b><small>hoặc bấm để chọn file</small></div>
+    <input type="file" id="file" accept=".jar,.zip" class="hide">
+    <div class="pr hide" id="pr"><i></i></div>
+    <div id="res" class="hide">
+     <div class="score"><div class="ring" id="ring"><i id="rn">0</i></div><div><h3 id="rt"></h3><p id="rs"></p></div></div>
+     <div class="list" id="list"></div>
+     <button class="btn ghost" id="bJson" type="button" style="margin-top:14px">📤 Báo cáo JSON</button>
+     <textarea id="jsonOut" class="hide" readonly rows="8" style="width:100%;margin-top:10px;background:rgba(0,0,0,.4);color:var(--ink);border:1px solid var(--line);border-radius:12px;font:12px 'JetBrains Mono',monospace;padding:10px"></textarea>
+    </div>
+    <div class="msg" id="smsg" role="alert"></div>
+   </div>
+  </section>
 
-<h2>DKhang Shop</h2>
+  <section class="pg" id="pg-src">
+   <h2>Mã nguồn</h2><p class="sub">Duyệt cây file trong jar và chọn một class để xem. Dòng đỏ là dấu hiệu nguy hiểm. Bấm “Đọc mã nguồn Java” để decompile class đó.</p>
+   <div class="pnl"><div class="lock" id="srcL"><b>Cần gói Pro</b>Vào tab Key để kích hoạt.</div>
+    <div id="srcB"><div class="lock hide" id="srcE"><b>Chưa có file nào</b>Hãy quét một file .jar ở tab Scanner trước.</div>
+    <div id="jvG" class="hide"></div><div class="src hide" id="srcG"><div class="cls" id="cls"></div><pre id="code">Chọn một class bên trái.</pre></div></div></div>
+  </section>
 
-<input id="user" placeholder="Tên đăng nhập">
-<input id="pass" type="password" placeholder="Mật khẩu">
+  <section class="pg" id="pg-bot">
+   <h2>Bot hỏi Key</h2><p class="sub">Bot AI phân tích kết quả quét của file vừa rồi. Hỏi tự nhiên, ví dụ "key/webhook của file này ở đâu?".</p>
+   <div class="pnl"><div class="lock" id="botL"><b>Cần gói Basic</b>Vào tab Key để kích hoạt.</div>
+    <div id="botB"><div id="chat"><div class="bb b">Mình sẵn sàng. Quét một file .jar rồi hỏi mình nhé.</div></div>
+    <div class="qs" id="qs"><button type="button" class="chip">File này có nguy hiểm không?</button><button type="button" class="chip">Key hoặc webhook ở đâu?</button><button type="button" class="chip">Giải thích các dấu hiệu</button><button type="button" class="chip">Tôi nên làm gì tiếp?</button></div>
+    <div class="row"><input id="q" type="text" placeholder="key/webhook của file này ở đâu?"><button class="btn" id="bAsk" type="button">Hỏi</button></div></div></div>
+  </section>
 
-<button onclick="login()">Đăng nhập</button>
-<button onclick="register()">Đăng ký</button>
+  <section class="pg" id="pg-key">
+   <h2>Kích hoạt license key</h2><p class="sub">Nhập key do admin cấp để mở gói Basic, Pro hoặc Elite.</p>
+   <div class="pnl"><label for="kin">License key</label><input id="kin" type="text" placeholder="SJ-PRO-XXXXXXXX"><button class="btn" id="bKey" type="button">Kích hoạt</button><div class="msg" id="kmsg" role="alert"></div></div>
+  </section>
 
+  <section class="pg" id="pg-acc">
+   <h2>Tài khoản</h2><p class="sub">Thông tin đăng nhập và gói hiện tại.</p>
+   <div class="pnl"><div class="kv"><span>Tên</span><b id="aN"></b><span>Email</span><b id="aE"></b><span>Gói</span><b id="aP"></b></div><button class="btn ghost" id="bOut" type="button" style="margin-top:18px">Đăng xuất</button></div>
+  </section>
+
+  <section class="pg" id="pg-adm">
+   <h2>Admin</h2><p class="sub">Tạo license key và xem danh sách người dùng.</p>
+   <div class="pnl"><div class="lock" id="admL"><b>Chỉ dành cho admin</b>Tài khoản của bạn không có quyền này.</div>
+    <div id="admB"><div class="row"><select id="kp"><option value="1">Basic</option><option value="2">Pro</option><option value="3">Elite</option></select><button class="btn" id="bGen" type="button">Tạo key</button></div>
+    <table id="kt"></table><h3 style="margin:22px 0 8px">Nhạc nền</h3><div class="row"><input type="file" id="mf" accept=".mp3,.ogg,.wav,.m4a,audio/*"><button class="btn" id="bUp" type="button">Tải lên</button></div><div class="msg" id="amsg" role="alert"></div><table id="mt"></table><h3 style="margin:22px 0 0">Người dùng</h3><table id="ut"></table></div></div>
+  </section>
+ </div>
+ <nav id="dock" aria-label="Điều hướng"></nav>
+ <div id="hint">Chạm vào tab, hoặc <b>kéo ánh sáng</b> dọc theo thanh.</div>
+ <div id="pl"><b id="pt">Liệu giờ</b><small id="tm">0:00 / 4:18</small><input type="range" id="seek" min="0" max="258" value="0" aria-label="Tua nhạc">
+  <div class="ctl"><button id="shf" type="button" aria-label="Ngẫu nhiên">🔀</button><button id="prv" type="button" aria-label="Bài trước">⏮</button><button id="pp" type="button" aria-label="Phát">▶</button><button id="nxt" type="button" aria-label="Bài sau">⏭</button><button id="rep" type="button" aria-label="Lặp lại">🔁</button></div>
+  <input type="range" id="vol" min="0" max="100" value="50" aria-label="Âm lượng"></div>
+ <div id="orb"></div>
 </div>
 
 
-<!-- SHOP -->
-
-<div class="shop" id="shop">
-
-<header>
-DKhang Shop - Cày Thuê Blox Fruit
-</header>
-
-<div class="container">
-
-<div class="sidebar">
-
-<img src="https://tr.rbxcdn.com/180DAY-cc8c0a81a8e6a4e1c3e9e3cbbf2e1c91/150/150/AvatarHeadshot/Png">
-
-<div class="menu">
-
-<div onclick="showPage('account')">Thông Tin Tài Khoản</div>
-<div onclick="showPage('napthe')">Nạp Thẻ</div>
-<div onclick="showPage('rutrobux')">Rút Robux</div>
-<div onclick="showPage('lichsu')">Lịch sử</div>
-<div onclick="showPage('taikhoan')">Tài Khoản Đã Mua</div>
-<div onclick="showPage('setting')">Setting</div>
-
-</div>
-
-</div>
-
-<div class="content">
-
-<!-- Thông tin -->
-
-<div id="account" class="page">
-
-<div class="box">
-
-<div class="notice">
-Chọn gói dịch vụ
-</div>
-
-<h3>Tùy Chọn Gói Mua</h3>
-
-<select>
-<option>Chọn gói</option>
-<option>Cày Tim Levi</option>
-<option>Draco V1</option>
-<option>Draco V4</option>
-<option>Up Tộc V4</option>
-<option>Cày Beli</option>
-</select>
-
-<h3>Điền Thông Tin Mua</h3>
-
-<label>Tên Đăng Nhập Nick Roblox</label>
-<input placeholder="Nhập tên roblox">
-
-<label>Mật Khẩu Đăng Nhập Nick Roblox</label>
-<input type="password" placeholder="Nhập mật khẩu">
-
-<label>Ghi Chú</label>
-<textarea placeholder="Nhập ghi chú"></textarea>
-
-<label>Mã Giảm Giá</label>
-<input placeholder="Nhập mã nếu có">
-
-<button>Đặt ngay</button>
-
-</div>
-
-</div>
-
-<!-- Nạp thẻ -->
-
-<div id="napthe" class="page">
-
-<div class="box">
-
-<h3>Nạp Thẻ</h3>
-
-<input placeholder="Nhập mã thẻ">
-<button>Nạp</button>
-
-</div>
-
-</div>
-
-<!-- Rút robux -->
-
-<div id="rutrobux" class="page">
-
-<div class="box">
-
-<h3>Rút Robux</h3>
-
-<input placeholder="Nhập số robux">
-<button>Rút</button>
-
-</div>
-
-</div>
-
-<!-- Lịch sử -->
-
-<div id="lichsu" class="page">
-
-<h3>Lịch Sử Đơn Cày Thuê</h3>
-
-<table>
-
-<tr>
-<th>STT</th>
-<th>Gói</th>
-<th>Trạng thái</th>
-<th>Username</th>
-<th>Note</th>
-<th>Thời gian</th>
-</tr>
-
-<tr>
-<td>1</td>
-<td>Cày Levi</td>
-<td>Đang xử lý</td>
-<td>RobloxUser</td>
-<td>-</td>
-<td>20/3</td>
-</tr>
-
-</table>
-
-</div>
-
-<!-- Tài khoản đã mua -->
-
-<div id="taikhoan" class="page">
-
-<div class="box">
-
-<h3>Tài Khoản Đã Mua</h3>
-
-<p>Chưa có tài khoản</p>
-
-</div>
-
-</div>
-
-<!-- Setting -->
-
-<div id="setting" class="page">
-
-<div class="box">
-
-<h3>Setting Tài Khoản</h3>
-
-<p>Tài khoản đang đăng nhập: <b id="currentUser"></b></p>
-
-<button onclick="logout()">Thoát tài khoản</button>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+<div id="toasts" aria-live="polite"></div>
 <script>
+/* ===== Nền: trái đất bị hút vào hố vũ trụ ===== */
+(function(){
+  var c=document.getElementById('sky'),x=c.getContext('2d'),W,H,cx,cy,R,P=[],t=0;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size(){var d=Math.min(devicePixelRatio||1,2);W=c.width=innerWidth*d;H=c.height=innerHeight*d;x.setTransform(1,0,0,1,0,0);x.scale(d,d);W=innerWidth;H=innerHeight;
+    var m=W<760;cx=m?W*.5:W*.7;cy=m?H*.26:H*.5;R=Math.min(W,H)*(m?.09:.11);x.fillStyle='#04060d';x.fillRect(0,0,W,H)}
+  function spawn(p,far){var a=Math.random()*6.283,r=far?R*(1.3+Math.random()*7):R*(5+Math.random()*3);
+    p.a=a;p.r=r;p.s=.6+Math.random()*1.4;p.z=Math.random()}
+  size();addEventListener('resize',size);
+  for(var i=0;i<650;i++){var p={};spawn(p,true);P.push(p)}
+  var PL=[[2.1,.8,'#d9b38c',.2,0],[3.2,.5,'#e0643f',.28,0],[5.6,.3,'#9fe0ff',.25,1],[6.8,.22,'#b79cff',.33,0]];var bg=[];for(i=0;i<140;i++)bg.push([Math.random(),Math.random(),Math.random()*1.2+.2]);
+  function earth(ex,ey,er){
+    x.save();x.beginPath();x.arc(ex,ey,er,0,6.283);x.clip();
+    var g=x.createRadialGradient(ex-er*.3,ey-er*.3,er*.2,ex,ey,er);g.addColorStop(0,'#4aa8ff');g.addColorStop(1,'#0a2a6e');x.fillStyle=g;x.fillRect(ex-er,ey-er,er*2,er*2);
+    x.fillStyle='#2fa66a';var o=(t*12)%(er*4);
+    for(var k=0;k<2;k++){var ox=ex-er*2+o-k*er*4;
+      x.beginPath();x.ellipse(ox+er*.5,ey-er*.2,er*.5,er*.3,.4,0,6.283);x.ellipse(ox+er*1.3,ey+er*.35,er*.4,er*.5,-.3,0,6.283);x.ellipse(ox+er*2.1,ey-er*.1,er*.3,er*.2,0,0,6.283);x.fill()}
+    var s=x.createLinearGradient(ex-er,ey,ex+er,ey);s.addColorStop(0,'rgba(0,0,0,0)');s.addColorStop(1,'rgba(0,0,10,.75)');x.fillStyle=s;x.fillRect(ex-er,ey-er,er*2,er*2);
+    x.restore();
+    var h=x.createRadialGradient(ex,ey,er*.95,ex,ey,er*1.5);h.addColorStop(0,'rgba(90,180,255,.35)');h.addColorStop(1,'rgba(90,180,255,0)');x.fillStyle=h;x.beginPath();x.arc(ex,ey,er*1.5,0,6.283);x.fill()}
+  function frame(){
+    t+=.016;
+    x.globalCompositeOperation='source-over';x.fillStyle='rgba(4,6,13,.22)';x.fillRect(0,0,W,H);
+    x.fillStyle='#fff';for(var i=0;i<bg.length;i++){var b=bg[i];x.globalAlpha=.25+.35*Math.abs(Math.sin(t*b[2]+i));x.fillRect(b[0]*W,b[1]*H,b[2],b[2])}x.globalAlpha=1;
+    x.globalCompositeOperation='lighter';
+    for(i=0;i<P.length;i++){var p=P[i],k=R/p.r,w=(reduce?.004:.012)*p.s*(1+k*k*9),px=cx+Math.cos(p.a)*p.r,py=cy+Math.sin(p.a)*p.r*.42;
+      p.a+=w;p.r-=(reduce?.05:.18+k*k*2.2)*p.s;
+      var nx=cx+Math.cos(p.a)*p.r,ny=cy+Math.sin(p.a)*p.r*.42;
+      if(p.r<R*.9){spawn(p,false);continue}
+      var h=k>.5?30:k>.25?210-(k-.25)*700:215;x.strokeStyle='hsla('+h+',90%,'+(55+k*30)+'%,'+Math.min(1,.25+k)+')';x.lineWidth=.6+k*2;
+      x.beginPath();x.moveTo(px,py);x.lineTo(nx,ny);x.stroke()}
+    x.globalCompositeOperation='source-over';
+    var gl=x.createRadialGradient(cx,cy,R*.9,cx,cy,R*2.6);gl.addColorStop(0,'rgba(255,170,70,.55)');gl.addColorStop(.35,'rgba(255,120,30,.18)');gl.addColorStop(1,'rgba(255,120,30,0)');
+    x.fillStyle=gl;x.beginPath();x.arc(cx,cy,R*2.6,0,6.283);x.fill();
+    x.fillStyle='#000';x.beginPath();x.arc(cx,cy,R,0,6.283);x.fill();
+    x.strokeStyle='rgba(255,200,120,.9)';x.lineWidth=2;x.beginPath();x.arc(cx,cy,R,0,6.283);x.stroke();
+    for(var q=0;q<PL.length;q++){var o=PL[q],aa=t*o[1]+q*1.7,pr=R*o[0],qx=cx+Math.cos(aa)*pr,qy=cy+Math.sin(aa)*pr*.42,rr=R*o[3];
+      if(o[4]){x.strokeStyle='rgba(200,230,255,.6)';x.lineWidth=2;x.beginPath();x.ellipse(qx,qy,rr*2,rr*.6,-.3,0,6.283);x.stroke()}
+      var gg=x.createRadialGradient(qx-rr*.3,qy-rr*.3,rr*.1,qx,qy,rr);gg.addColorStop(0,'#fff');gg.addColorStop(.25,o[2]);gg.addColorStop(1,'#080a14');x.fillStyle=gg;x.beginPath();x.arc(qx,qy,rr,0,6.283);x.fill()}
+    /* trái đất đi theo quỹ đạo xoắn ốc, bị hút gần hố rồi trở lại */
+    var cyc=(t*.07)%1,er=R*(.55-.3*cyc),orR=R*(4.4-2.9*cyc),ea=-t*.5-cyc*5;
+    var ex=cx+Math.cos(ea)*orR,ey=cy+Math.sin(ea)*orR*.42-R*.25*(1-cyc);
+    if(Math.sin(ea)>0||true){ earth(ex,ey,Math.max(er,R*.2)) }
+    if(cyc>.93){x.fillStyle='rgba(4,6,13,'+((cyc-.93)*14)+')';x.fillRect(0,0,W,H)}
+    requestAnimationFrame(frame)}
+  frame();
+})();
 
-function showPage(page){
+/* ===== Đăng nhập / đăng ký (qua server) ===== */
+var $=function(i){return document.getElementById(i)};
+function api(path,opt){
+  opt=opt||{};var o={method:opt.method||'GET',credentials:'same-origin',headers:{}};
+  if(opt.body instanceof FormData){o.body=opt.body}else if(opt.body){o.headers['Content-Type']='application/json';o.body=JSON.stringify(opt.body)}
+  return fetch(path,o).catch(function(){throw new Error('Không kết nối được server. Hãy chạy server rồi mở http://127.0.0.1:8000')})
+   .then(function(r){return r.json().catch(function(){return {}}).then(function(d){
+     if(!r.ok){var e=new Error(r.status===404?'Server đang chạy không có API này (404). Trang này không được phục vụ bởi server.py mới. Hãy mở đúng http://127.0.0.1:8000 sau khi chạy uvicorn.':typeof d.detail==='string'?d.detail:'Thông tin chưa hợp lệ ('+r.status+')');e.status=r.status;if(d.detail==='GATE'){e.message='Hãy xác minh Cloudflare trước.';if(window.gateShow)gateShow()}throw e}return d})})}
+function say(m){$('msg').textContent=m}
+function tab(i){$('tabs').dataset.t=i;[].forEach.call($('tabs').querySelectorAll('button'),function(b,k){b.classList.toggle('on',k==i)});
+  $('fLogin').classList.toggle('hide',i!=0);$('fReg').classList.toggle('hide',i!=1);say('');if(window.ensureTs)ensureTs()}
+[].forEach.call($('tabs').querySelectorAll('button'),function(b){b.onclick=function(){tab(+b.dataset.i)}});
+$('bReg').onclick=function(){
+  var u=$('ru').value.trim(),e=$('re').value.trim(),p=$('rp').value;
+  if(!/^[A-Za-z0-9_.-]{3,24}$/.test(u))return say('Tên đăng nhập 3–24 ký tự, chỉ gồm chữ, số, dấu . _ -');
+  if(!/^\S+@\S+\.\S+$/.test(e))return say('Email chưa đúng định dạng.');
+  if(p.length<6)return say('Mật khẩu cần ít nhất 6 ký tự.');
+  if(p!==$('rp2').value)return say('Hai mật khẩu chưa khớp.');
+  api('/api/register/start',{method:'POST',body:{username:u,email:e,password:p}}).then(function(r){showOtp(r.email,e)}).catch(function(x){say(x.message)})};
+$('bLogin').onclick=function(){
+  api('/api/login',{method:'POST',body:{username:$('lu').value.trim(),password:$('lp').value}}).then(enter).catch(function(x){say(x.message)})};
+['lp','rp2'].forEach(function(i){$(i).addEventListener('keydown',function(e){if(e.key==='Enter')(i==='lp'?$('bLogin'):$('bReg')).click()})});
 
-var pages=document.getElementsByClassName("page");
+var tsKey='',gW=null;
+function boot(){api('/api/me').then(enter).catch(function(){})}
+function gateShow(){
+  $('gate').classList.remove('hide');
+  (function wait(){
+    if(!window.turnstile)return setTimeout(wait,200);
+    if(gW!==null)return turnstile.reset(gW);
+    gW=turnstile.render($('gateTs'),{sitekey:tsKey,theme:'dark',callback:function(tok){
+      $('gmsg').textContent='Đang xác nhận...';
+      api('/api/gate',{method:'POST',body:{cf:tok}}).then(function(){$('gate').classList.add('hide');$('gmsg').textContent='';boot()})
+       .catch(function(x){$('gmsg').textContent=x.message;turnstile.reset(gW)})}})})()}
+api('/api/config').then(function(c){tsKey=c.turnstile_site_key||'';if(tsKey&&!c.gate_passed)gateShow();else boot()}).catch(function(){boot()});
 
-for(var i=0;i<pages.length;i++){
-pages[i].style.display="none";
+/* OTP email khi đăng ký */
+var pendEmail='',resendT=0,resendI=null;
+function boxes(){return [].slice.call(document.querySelectorAll('#otpBoxes input'))}
+function otpCode(){return boxes().map(function(b){return b.value}).join('')}
+function cooldown(n){clearInterval(resendI);resendT=n;var b=$('bResend');b.disabled=true;
+  function t(){if(resendT<=0){b.disabled=false;b.textContent='Gửi lại mã';clearInterval(resendI)}else{b.textContent='Gửi lại sau '+resendT+'s';resendT--}}t();resendI=setInterval(t,1000)}
+function showOtp(masked,email){
+  pendEmail=email;$('otpTo').textContent=masked;
+  ['tabs','fLogin','fReg'].forEach(function(i){$(i).classList.add('hide')});$('fOtp').classList.remove('hide');say('');
+  boxes().forEach(function(b){b.value=''});$('tipPre').textContent='';boxes()[0].focus();cooldown(60)}
+function otpBack(){clearInterval(resendI);$('fOtp').classList.add('hide');$('tabs').classList.remove('hide');tab(1)}
+function submitOtp(){
+  var c=otpCode();if(c.length<6)return say('Nhập đủ 6 số.');
+  api('/api/register/verify',{method:'POST',body:{email:pendEmail,code:c}}).then(function(u){clearInterval(resendI);$('fOtp').classList.add('hide');$('tabs').classList.remove('hide');enter(u)})
+   .catch(function(x){say(x.message);boxes().forEach(function(b){b.value=''});boxes()[0].focus()})}
+boxes().forEach(function(b,i,a){
+  b.addEventListener('input',function(){b.value=b.value.replace(/\D/g,'').slice(-1);if(b.value&&a[i+1])a[i+1].focus();if(otpCode().length===6)submitOtp()});
+  b.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!b.value&&a[i-1])a[i-1].focus()});
+  b.addEventListener('paste',function(e){var d=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);if(!d)return;e.preventDefault();
+    d.split('').forEach(function(ch,k){a[k].value=ch});a[Math.min(d.length,5)].focus();if(d.length===6)submitOtp()})});
+$('bOtp').onclick=submitOtp;$('bBack').onclick=otpBack;
+$('bResend').onclick=function(){api('/api/register/resend',{method:'POST',body:{email:pendEmail}}).then(function(){say('');$('tipPre').textContent='Đã gửi lại mã. ';cooldown(60)}).catch(function(x){say(x.message)})};
+
+/* ===== Quét file .jar (đã sửa lỗi JSZip is not defined) ===== */
+var RULES=[
+ [/discord(app)?\.com\/api\/webhooks/i,'Gửi dữ liệu tới Discord webhook',45],
+ [/api\.telegram\.org\/bot/i,'Gửi dữ liệu tới Telegram bot',45],
+ [/(grabify|iplogger|ngrok\.io|pastebin\.com\/raw)/i,'Liên hệ dịch vụ theo dõi/tải payload',30],
+ [/java\/lang\/Runtime/,'Gọi Runtime (có thể chạy lệnh hệ thống)',15],
+ [/java\/lang\/ProcessBuilder/,'Dùng ProcessBuilder để chạy tiến trình',20],
+ [/defineClass/,'Nạp class động bằng defineClass',20],
+ [/java\/net\/URLClassLoader/,'Tải code từ URL (URLClassLoader)',25],
+ [/(\.minecraft|launcher_profiles|accounts\.json|Login Data|Local State|logins\.json)/i,'Đụng tới file đăng nhập/token trình duyệt hoặc game',40],
+ [/(cmd\.exe|powershell|\/bin\/sh|\/bin\/bash)/i,'Gọi shell hệ thống',25],
+ [/(session[_ ]?id|getSession|accessToken)/i,'Đọc session/token người chơi',20],
+ [/java\/util\/Base64/,'Dùng Base64 (hay gặp ở code che giấu)',6],
+ [/(java\/lang\/reflect\/Method|Class\.forName)/,'Dùng reflection',6],
+ [/java\/net\/(HttpURLConnection|URL)/,'Kết nối mạng',5]
+];
+var lat=new TextDecoder('latin1');
+function prog(v){$('pr').classList.remove('hide');$('pr').firstChild.style.width=v+'%'}
+function scan(file){
+  $('smsg').textContent='';$('res').classList.add('hide');
+  if(typeof JSZip==='undefined'){$('smsg').textContent='Chưa nạp được thư viện JSZip. Kiểm tra mạng rồi tải lại trang.';return}
+  prog(3);
+  JSZip.loadAsync(file).then(function(zip){
+    var names=Object.keys(zip.files).filter(function(n){return !zip.files[n].dir}),found={},score=0,i=0,classes=0,urls=[],cl=[];
+    function next(){
+      if(i>=names.length)return done();
+      var n=names[i++];prog(5+90*i/names.length);
+      var lower=n.toLowerCase();
+      if(/\.(png|jpg|jpeg|gif|ogg|wav|ttf)$/.test(lower))return setTimeout(next,0);
+      if(lower.slice(-6)==='.class'){classes++;cl.push(n)}
+      zip.files[n].async('uint8array').then(function(buf){
+        if(buf.length>8e6)return setTimeout(next,0);
+        var s=lat.decode(buf);(s.match(/https?:\/\/[^\s"'<>\x00-\x1f\x7f-\xff]{6,140}/g)||[]).forEach(function(u){if(urls.length<60)urls.push({u:u,f:n})});
+        RULES.forEach(function(r){if(r[0].test(s)){var f=found[r[1]]||(found[r[1]]={w:r[2],files:[]});if(f.files.length<3)f.files.push(n)}});
+        setTimeout(next,0)}).catch(function(){setTimeout(next,0)})}
+    function done(){
+      var arr=Object.keys(found).map(function(k){return{t:k,w:found[k].w,f:found[k].files}}).sort(function(a,b){return b.w-a.w});
+      arr.forEach(function(a){score+=a.w});score=Math.min(100,score);
+      var c=score>=60?'var(--bad)':score>=30?'var(--warn)':'var(--ok)';
+      var v=score>=60?'Nguy cơ cao':score>=30?'Đáng ngờ':'Tương đối an toàn';
+      lastScan={name:file.name,size:file.size,score:score,verdict:v,files:names.length,classes:classes,findings:arr,urls:urls,cl:cl,zip:zip};if(window.afterScan)afterScan();$('ring').style.setProperty('--p',score);$('ring').style.setProperty('--c',c);$('rn').textContent=score;
+      $('rt').textContent=v;$('rt').style.color=c;
+      $('rs').textContent=file.name+' · '+names.length+' file · '+classes+' class · '+arr.length+' dấu hiệu';
+      $('list').innerHTML='';
+      if(!arr.length){var e=document.createElement('div');e.className='f';e.style.setProperty('--c','var(--ok)');e.innerHTML='<b>Không thấy dấu hiệu bất thường</b>';$('list').appendChild(e)}
+      arr.forEach(function(a){var d=document.createElement('div');d.className='f';d.style.setProperty('--c',a.w>=30?'var(--bad)':a.w>=15?'var(--warn)':'var(--acc2)');
+        var b=document.createElement('b');b.textContent=a.t;var m=document.createElement('div');m.textContent=a.f.join('\n');m.style.whiteSpace='pre-line';d.appendChild(b);d.appendChild(m);$('list').appendChild(d)});
+      $('res').classList.remove('hide');prog(100);toast(arr.length?'Quét xong, thấy '+arr.length+' dấu hiệu đáng ngờ.':'Quét xong, không thấy dấu hiệu bất thường.',{type:arr.length?'bad':'ok',icon:arr.length?'⚠️':'✅'})}
+    next()
+  }).catch(function(e){$('pr').classList.add('hide');$('smsg').textContent='Không đọc được file: '+(e&&e.message||e)})
 }
+var dz=$('drop'),fi=$('file');
+dz.onclick=function(){fi.click()};dz.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click()}};
+fi.onchange=function(){if(fi.files[0])scan(fi.files[0])};
+['dragover','dragenter'].forEach(function(n){dz.addEventListener(n,function(e){e.preventDefault();dz.classList.add('over')})});
+['dragleave','drop'].forEach(function(n){dz.addEventListener(n,function(e){e.preventDefault();dz.classList.remove('over')})});
+dz.addEventListener('drop',function(e){var f=e.dataTransfer.files[0];if(f)scan(f)});
 
-document.getElementById(page).style.display="block";
+/* ===== Ứng dụng: trang, gói, dock, nhạc ===== */
+var PN=['Free','Basic','Pro','Elite'],me=null,lastScan=null;
+function enter(u){
+  me={name:u.username,email:u.email,plan:u.plan,admin:!!u.is_admin};
+  $('mainAuth').classList.add('hide');$('app').classList.remove('hide');paint();loadTracks();go('home',true)}
+function paint(){
+  $('plan').innerHTML='Gói <b>'+PN[me.plan]+'</b>'+(me.admin?' · Admin':'');
+  $('who').textContent=me.name;$('aN').textContent=me.name;$('aE').textContent=me.email||'—';$('aP').textContent=PN[me.plan];
+  $('bJson').style.display=me.plan>=3?'':'none'}
+var TABS=[['home','Trang chủ','M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'],['scan','Scanner','M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5'],['src','Mã nguồn','M8 7l-5 5 5 5M16 7l5 5-5 5'],['bot','Bot Key','M5 8h14v10H5zM12 4v4M9 13h.01M15 13h.01'],['key','Key','M15 7a4 4 0 1 1-3 6.7L4 21v-3h3v-3h3'],['acc','Tài khoản','M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6'],['adm','Admin','M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z']];
+$('dock').innerHTML='<i id="ind"></i>'+TABS.map(function(t){return '<button type="button" data-id="'+t[0]+'"><svg viewBox="0 0 24 24"><path d="'+t[2]+'"/></svg><span>'+t[1]+'</span></button>'}).join('');
+var order=TABS.map(function(t){return t[0]}),cur=null,snd=true,AC2;
+function tick(f,v,d){if(!snd)return;d=d||.04;try{AC2=AC2||new (window.AudioContext||window.webkitAudioContext)();if(AC2.state==='suspended')AC2.resume();
+  var o=AC2.createOscillator(),g=AC2.createGain(),t=AC2.currentTime;o.type='square';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.5,t+d*.8);
+  g.gain.setValueAtTime(v||.03,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC2.destination);o.start(t);o.stop(t+d+.01)}catch(e){}}
+function moveInd(){var b=$('dock').querySelector('button.on'),i=$('ind');if(b&&b.offsetWidth){i.style.width=b.offsetWidth+'px';i.style.transform='translateX('+b.offsetLeft+'px)'}}
+addEventListener('resize',moveInd);
+/* Thông báo góc màn hình + mẹo */
+var TIPS={scan:'Kéo thả file .jar vào khung, file được quét ngay trên máy bạn.',src:'Bấm một class rồi chọn “Đọc mã nguồn Java” để decompile.',bot:'Thử hỏi bot: “webhook của file này ở đâu?”',key:'Nhập key do admin cấp để mở thêm tính năng.'},tipped={};
+function toast(msg,o){o=o||{};var box=$('toasts');
+  while(box.children.length>=3)box.firstChild.remove();
+  var d=document.createElement('div');d.className='ts'+(o.type?' '+o.type:'');
+  var ic=document.createElement('span');ic.textContent=o.icon||'💡';ic.setAttribute('aria-hidden','true');
+  var tx=document.createElement('div');tx.className='tx';tx.textContent=msg;
+  var x=document.createElement('button');x.type='button';x.textContent='×';x.setAttribute('aria-label','Đóng');
+  d.append(ic,tx,x);var t;
+  function hide(){clearTimeout(t);d.classList.add('out');setTimeout(function(){d.remove()},260)}
+  function arm(){t=setTimeout(hide,o.ms||6500)}
+  if(o.action){var a=document.createElement('button');a.type='button';a.className='lnk';a.textContent=o.action[0];a.onclick=function(){o.action[1]();hide()};tx.appendChild(document.createElement('br'));tx.appendChild(a)}
+  x.onclick=hide;d.onmouseenter=function(){clearTimeout(t)};d.onmouseleave=arm;
+  box.appendChild(d);arm()}
+function tip(id){var g={src:2,bot:1};if(!TIPS[id]||tipped[id]||(g[id]&&me.plan<g[id]))return;
+  try{if(localStorage.getItem('sj_tips')==='0')return}catch(e){}
+  tipped[id]=1;setTimeout(function(){if(cur!==id)return;toast(TIPS[id],{action:['Tắt mẹo',function(){try{localStorage.setItem('sj_tips','0')}catch(e){}}]})},700)}
+function go(id,quiet){
+  var prev=cur,pi=prev?order.indexOf(prev):-1,dir=order.indexOf(id)>=pi?1:-1;cur=id;
+  [].forEach.call(document.querySelectorAll('.pg'),function(e){var on=e.id==='pg-'+id;e.classList.toggle('on',on);
+    if(on&&!quiet&&prev!==id){e.style.setProperty('--dx',(dir*70)+'px');e.classList.remove('in');void e.offsetWidth;e.classList.add('in')}});
+  [].forEach.call($('dock').querySelectorAll('button'),function(b){b.classList.toggle('on',b.dataset.id===id)});moveInd();
+  var g={src:2,bot:1};if(g[id]){$(id+'L').classList.toggle('hide',me.plan>=g[id]);$(id+'B').classList.toggle('hide',me.plan<g[id])}
+  if(id==='adm'){$('admL').classList.toggle('hide',!!me.admin);$('admB').classList.toggle('hide',!me.admin);renderAdm()}
+  if(id==='src')renderSrc();
+  if(!quiet)tip(id);
+  if(!quiet&&prev!==id){tick(640,.05,.08);setTimeout(function(){tick(1250,.03,.05)},70)}
+  scrollTo(0,0)}
+var lastH=null;
+document.addEventListener('pointerover',function(e){if(e.pointerType==='touch')return;
+  var h=e.target.closest&&e.target.closest('#dock button,.btn,.fc,.pc,.chip,.drop,.cls button,.ctl button');if(h&&h!==lastH)tick(h.closest('#dock')?2300:1700,.022);lastH=h});
+document.addEventListener('pointermove',function(e){
+  var g=$('cg');g.style.transform='translate('+e.clientX+'px,'+e.clientY+'px)';
+  var c=e.target.closest&&e.target.closest('.fc,.pc');if(c){var r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+    c.style.setProperty('--mx',(px*100)+'%');c.style.setProperty('--my',(py*100)+'%');c.style.setProperty('--ry',((px-.5)*9)+'deg');c.style.setProperty('--rx',(-(py-.5)*9)+'deg')}});
+$('snd').onclick=function(){snd=!snd;this.textContent=snd?'🔊':'🔇';if(snd)tick(1500,.03)};
+$('dock').onclick=function(e){var b=e.target.closest('button');if(b)go(b.dataset.id)};
+$('dock').onpointermove=function(e){if(e.buttons){var el=document.elementFromPoint(e.clientX,e.clientY),b=el&&el.closest&&el.closest('#dock button');if(b)go(b.dataset.id)}};
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
-}
+/* Scanner: báo cáo JSON (Elite) */
+function afterScan(){hist=[];$('jsonOut').classList.add('hide')}
+$('bJson').onclick=function(){
+  if(!lastScan)return;
+  var o={file:lastScan.name,score:lastScan.score,verdict:lastScan.verdict,files:lastScan.files,classes:lastScan.classes,findings:lastScan.findings,urls:lastScan.urls};
+  var j=JSON.stringify(o,null,2),t=$('jsonOut');t.value=j;t.classList.remove('hide');t.select();
+  try{navigator.clipboard.writeText(j)}catch(e){}};
 
-function register(){
+/* Mã nguồn */
+var jvDone=null;
+function lineWeight(l){var w=0;RULES.forEach(function(r){if(r[0].test(l)&&r[2]>w)w=r[2]});if(/^https?:/.test(l))w=Math.max(w,10);return w}
+function renderSrc(){
+  var has=lastScan&&lastScan.cl.length,nv=!!window.JarViewer;
+  $('srcE').classList.toggle('hide',!!has||me.plan<2);$('jvG').classList.toggle('hide',!(has&&nv));$('srcG').classList.toggle('hide',!(has&&!nv));
+  if(!has)return;
+  if(nv){if(jvDone!==lastScan){jvDone=lastScan;JarViewer.mount($('jvG'),{zip:lastScan.zip,name:lastScan.name,size:lastScan.size||0,weight:lineWeight,canDecompile:me.plan>=2})}return}
+  var box=$('cls');box.innerHTML='';
+  lastScan.cl.slice(0,600).forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n.replace(/\.class$/,'');
+    b.onclick=function(){[].forEach.call(box.children,function(c){c.classList.remove('on')});b.classList.add('on');showClass(n)};box.appendChild(b)})}
+function showClass(n){
+  var pre=$('code');pre.textContent='Đang đọc...';
+  lastScan.zip.files[n].async('uint8array').then(function(buf){
+    var m=lat.decode(buf).match(/[\x20-\x7e]{5,}/g)||[],seen={},out=document.createDocumentFragment();
+    m.slice(0,900).forEach(function(l){if(seen[l])return;seen[l]=1;var w=0;RULES.forEach(function(r){if(r[0].test(l)&&r[2]>w)w=r[2]});if(/^https?:/.test(l))w=Math.max(w,10);
+      var d=document.createElement('div');d.textContent=l;if(w>=15)d.className='dg';else if(w>=5)d.className='wn';out.appendChild(d)});
+    pre.textContent='';pre.appendChild(out);if(!pre.firstChild)pre.textContent='Không có chuỗi đọc được.'})}
 
-var user=document.getElementById("user").value;
-var pass=document.getElementById("pass").value;
+/* Bot hỏi Key */
+var hist=[],botBusy=false;
+function say2(t,u){var d=document.createElement('div');d.className='bb '+(u?'u':'b');d.textContent=t;$('chat').appendChild(d);$('chat').scrollTop=1e5;return d}
+function typeIn(el,text){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches){el.textContent=text;return}
+  var i=0,step=Math.max(2,Math.ceil(text.length/160));
+  (function f(){i+=step;el.textContent=text.slice(0,i);$('chat').scrollTop=1e5;if(i<text.length)setTimeout(f,18)})()}
+function botCtx(){return {name:lastScan.name,score:lastScan.score,verdict:lastScan.verdict,files:lastScan.files,classes:lastScan.classes,
+  findings:lastScan.findings.slice(0,20).map(function(f){return {t:f.t,w:f.w}}),urls:lastScan.urls.slice(0,25).map(function(x){return {u:x.u,f:x.f}})}}
+function localAnswer(q){
+  if(/key|webhook|token|url|link|ở đâu|api/i.test(q)){
+    var hot=lastScan.urls.filter(function(x){return /webhook|telegram|token|key|api|paste|ngrok|grabify/i.test(x.u)}),use=hot.length?hot:lastScan.urls;
+    if(!use.length)return say2('Không thấy URL, webhook hay key dạng văn bản trong '+lastScan.name+'. Nếu file bị che giấu (obfuscate) thì chúng có thể đã được mã hóa.');
+    return say2((hot.length?'Tìm thấy '+hot.length+' mục đáng ngờ:\n':'Không có webhook rõ ràng, nhưng có các URL này:\n')+use.slice(0,6).map(function(x){return '• '+x.u+'\n   trong '+x.f}).join('\n'))}
+  say2(lastScan.name+': điểm rủi ro '+lastScan.score+'/100 ('+lastScan.verdict+').\n'+(lastScan.findings.slice(0,4).map(function(f){return '• '+f.t}).join('\n')||'Không có dấu hiệu bất thường.'))}
 
-if(user==""||pass==""){
-alert("Vui lòng nhập tài khoản và mật khẩu");
-return;
-}
+function ask(q0){
+  var q=(typeof q0==='string'?q0:$('q').value).trim();if(!q||botBusy)return;say2(q,1);$('q').value='';
+  if(!lastScan)return say2('Chưa có file nào. Hãy quét một file .jar ở tab Scanner trước.');
+  botBusy=true;var th=say2('Đang phân tích…');
+  hist.push({role:'user',content:q.slice(0,2000)});hist=hist.slice(-10);while(hist.length&&hist[0].role!=='user')hist.shift();
+  api('/api/bot',{method:'POST',body:{messages:hist,scan:botCtx()}}).then(function(r){
+    hist.push({role:'assistant',content:r.text});typeIn(th,r.text)
+  }).catch(function(e){
+    hist.pop();th.remove();
+    if(e.status===429||e.status===403)return say2(e.message);
+    localAnswer(q)
+  }).then(function(){botBusy=false})}
+$('qs').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textContent)};
+$('bAsk').onclick=ask;$('q').addEventListener('keydown',function(e){if(e.key==='Enter')ask()});
 
-localStorage.setItem("user",user);
-localStorage.setItem("pass",pass);
+/* Key, Admin, Nhạc (qua server) */
+$('bKey').onclick=function(){
+  var m=$('kmsg');m.style.color='var(--bad)';
+  api('/api/key/activate',{method:'POST',body:{code:$('kin').value}}).then(function(u){me.plan=u.plan;paint();m.style.color='var(--ok)';m.textContent='Đã kích hoạt gói '+PN[me.plan]+'.';toast('Đã kích hoạt gói '+PN[me.plan]+'.',{type:'ok',icon:'🔑'})}).catch(function(x){m.textContent=x.message})};
+$('bOut').onclick=function(){
+  var done=function(){aud.pause();me=null;$('app').classList.add('hide');$('mainAuth').classList.remove('hide');cur=null;tab(0)};
+  api('/api/logout',{method:'POST'}).then(done,done)};
+function cell(r,t,h){var c=document.createElement(h?'th':'td');c.textContent=t;r.appendChild(c);return c}
+function fill(tb,head,rows){tb.innerHTML='';var r=tb.insertRow();head.forEach(function(h){cell(r,h,1)});rows.forEach(function(row){var r2=tb.insertRow();row.forEach(function(v){cell(r2,v)})})}
+function renderAdm(){
+  if(!me.admin)return;
+  api('/api/admin/keys').then(function(k){fill($('kt'),['Key','Gói','Trạng thái'],k.map(function(x){return [x.code,PN[x.plan],x.used_by?'Đã dùng: '+x.used_by:'Còn trống']}))}).catch(function(){});
+  api('/api/admin/users').then(function(u){fill($('ut'),['Người dùng','Email','Gói'],u.map(function(x){return [x.username+(x.is_admin?' (admin)':''),x.email||'—',PN[x.plan]]}))}).catch(function(){});
+  api('/api/music').then(function(m){var tb=$('mt');fill(tb,['Bài hát',''],m.map(function(x){return [x.title,'']}));
+    m.forEach(function(x,i){var b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent='Xóa';
+      b.onclick=function(){api('/api/admin/music/'+x.id,{method:'DELETE'}).then(function(){loadTracks();renderAdm()})};tb.rows[i+1].cells[1].appendChild(b)})}).catch(function(){})}
+$('bGen').onclick=function(){api('/api/admin/keys',{method:'POST',body:{plan:+$('kp').value}}).then(renderAdm)};
+$('bUp').onclick=function(){
+  var f=$('mf').files[0],m=$('amsg');m.style.color='var(--bad)';if(!f)return m.textContent='Hãy chọn một file nhạc trước.';
+  var fd=new FormData();fd.append('file',f);m.style.color='var(--mute)';m.textContent='Đang tải lên...';
+  api('/api/admin/music',{method:'POST',body:fd}).then(function(){m.style.color='var(--ok)';m.textContent='Đã tải lên.';$('mf').value='';loadTracks();renderAdm()}).catch(function(x){m.style.color='var(--bad)';m.textContent=x.message})};
 
-alert("Đăng ký thành công! Hãy đăng nhập lại.");
-
-document.getElementById("user").value="";
-document.getElementById("pass").value="";
-
-}
-
-function login(){
-
-var user=document.getElementById("user").value;
-var pass=document.getElementById("pass").value;
-
-var savedUser=localStorage.getItem("user");
-var savedPass=localStorage.getItem("pass");
-
-if(user===savedUser && pass===savedPass){
-
-document.getElementById("login").style.display="none";
-document.getElementById("shop").style.display="block";
-
-document.getElementById("currentUser").innerText=user;
-
-showPage("account");
-
-}else{
-
-alert("Sai tên đăng nhập hoặc mật khẩu");
-
-}
-
-}
-
-function logout(){
-
-document.getElementById("shop").style.display="none";
-document.getElementById("login").style.display="block";
-
-}
+var aud=new Audio(),TR=[],tk=0,shuf=false,rep=false;aud.volume=.5;
+function fmt(n){n=isFinite(n)?Math.floor(n):0;return Math.floor(n/60)+':'+('0'+n%60).slice(-2)}
+function ui(){var t=TR[tk];$('pt').textContent=t?t.title:'Chưa có nhạc';$('tm').textContent=fmt(aud.currentTime)+' / '+fmt(aud.duration);$('pp').textContent=aud.paused?'▶':'⏸'}
+var autoDone=false;
+function autoplay(){
+  if(autoDone||!TR.length)return;autoDone=true;
+  aud.play().catch(function(){
+    toast('Nhấn vào bất kỳ đâu để bật nhạc nền.',{icon:'🎵'});
+    var once=function(e){if(e.target.closest&&e.target.closest('#pl,#orb'))return;
+      document.removeEventListener('pointerdown',once,true);document.removeEventListener('keydown',once,true);
+      if(aud.paused)aud.play().catch(function(){})};
+    document.addEventListener('pointerdown',once,true);document.addEventListener('keydown',once,true)})}
+function loadTracks(){api('/api/music').then(function(l){var was=TR.length?TR[tk]:null;TR=l;tk=0;if(was)l.forEach(function(x,i){if(x.id===was.id)tk=i});
+  if(TR.length&&(!aud.src||!was||!TR.some(function(x){return was&&x.id===was.id})))aud.src=TR[tk].url;ui();autoplay()}).catch(function(){})}
+function playIdx(i){if(!TR.length)return;tk=i;aud.src=TR[tk].url;aud.play().catch(function(){});ui()}
+function pick(d){if(TR.length)playIdx(shuf?Math.floor(Math.random()*TR.length):(tk+d+TR.length)%TR.length)}
+$('pp').onclick=function(){if(TR.length)aud.paused?aud.play().catch(function(){}):aud.pause()};
+$('nxt').onclick=function(){pick(1)};$('prv').onclick=function(){pick(-1)};
+$('shf').onclick=function(){shuf=!shuf;this.classList.toggle('on',shuf)};$('rep').onclick=function(){rep=!rep;this.classList.toggle('on',rep)};
+$('seek').oninput=function(){aud.currentTime=+this.value};$('vol').oninput=function(){aud.volume=this.value/100};
+['play','pause','loadedmetadata','timeupdate'].forEach(function(ev){aud.addEventListener(ev,function(){$('seek').max=isFinite(aud.duration)?aud.duration:0;$('seek').value=aud.currentTime;ui()})});
+aud.addEventListener('ended',function(){if(rep){aud.currentTime=0;aud.play()}else pick(1)});
 
 </script>
-
 </body>
 </html>

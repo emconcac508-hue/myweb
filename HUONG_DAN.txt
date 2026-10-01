@@ -1,0 +1,12 @@
+SENTINELJAR 4.0 - HUONG DAN CHAY
+
+1. Giai nen thu muc jarscanner ra mot cho (vi du C:\jarscanner).
+2. Mo file chay_server.bat bang Notepad, doi ADMIN_PASS thanh mat khau cua ban, luu lai.
+3. Bam dup chay_server.bat. Cho den khi thay dong "Uvicorn running on http://127.0.0.1:8000".
+4. Mo trinh duyet vao http://127.0.0.1:8000 va dang nhap bang tai khoan admin.
+5. Vao tab Admin de tao key va tai nhac len.
+
+Chua cau hinh SMTP: ma OTP khi dang ky se hien trong cua so den (CMD).
+Chua cau hinh Turnstile: cong xac minh Cloudflare tu tat.
+Neu lan truoc chay server cu, hay tat het cua so CMD cu truoc (hoac taskkill /F /IM python.exe).
+Khong gui ADMIN_PASS, SMTP_PASS, TURNSTILE_SECRET cho ai.

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xem mã nguồn JAR</title>
+<style>
+:root{--bg:#fff;--panel:#f7f8fa;--line:#e3e6ea;--text:#1f2430;--mute:#6b7280;--accent:#0f766e;--btn:#6b7280;--sel:#e8f1f0}
+@media (prefers-color-scheme:dark){:root{--bg:#14171c;--panel:#1b1f26;--line:#2c323b;--text:#e6e8eb;--mute:#8b93a1;--accent:#2dd4bf;--btn:#4b5563;--sel:#1f2d2c}}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0}header small{color:var(--mute)}
+.tabs{display:flex;gap:6px;margin-left:12px}
+.tab{border:0;background:none;color:var(--mute);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit}
+.tab.on{background:var(--panel);color:var(--text);font-weight:600}
+.badge{background:#dbeafe;color:#1d4ed8;border-radius:10px;padding:0 8px;font-size:12px;margin-left:6px}
+main{flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.search{display:flex;gap:8px;padding:12px}
+.search input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+#tree{overflow:auto;padding:0 8px 12px;flex:1}
+.row{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row:hover{background:var(--panel)}.row.sel{background:var(--sel)}
+.dir{color:var(--accent)}.file{color:var(--mute)}
+.kids{margin-left:14px}.kids.hide{display:none}
+section{display:flex;flex-direction:column;min-width:0;min-height:0}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);min-height:50px}
+.bar .name{font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{border:0;border-radius:8px;padding:7px 14px;background:var(--accent);color:#fff;cursor:pointer;font:inherit}
+.btn:disabled{background:var(--btn);cursor:not-allowed;opacity:.8}
+.empty{margin:auto;text-align:center;color:var(--mute)}
+.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:4px}
+#code{flex:1;overflow:auto;margin:0;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;display:none}
+.ln{display:flex}.ln i{flex:none;width:56px;padding-right:12px;text-align:right;color:var(--mute);user-select:none;font-style:normal;background:var(--panel)}
+.ln span{padding-left:12px;white-space:pre}
+#msg{padding:8px 16px;color:#b45309;font-size:13px;display:none}
+@media (max-width:760px){main{grid-template-columns:1fr}aside{max-height:40vh;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Đang tải…</h1><small id="size"></small>
+  <div class="tabs">
+    <button class="tab on" id="tJar">Cây file</button>
+    <button class="tab" id="tStr">Chuỗi<span class="badge" id="cnt">…</span></button>
+  </div>
+</header>
+<main>
+  <aside>
+    <div class="search"><input id="q" placeholder="Tìm file…"></div>
+    <div id="tree"></div>
+  </aside>
+  <section>
+    <div class="bar"><span class="name" id="fname">Chưa chọn file</span><button class="btn" id="dec" hidden></button></div>
+    <div id="msg"></div>
+    <div class="empty" id="empty"><b>Chưa chọn file</b>Chọn một file ở cây bên trái để xem nội dung</div>
+    <pre id="code"></pre>
+  </section>
+</main>
+<script>
+const ID = new URLSearchParams(location.search).get('id');
+const API = '/api/jar/' + encodeURIComponent(ID);
+const $ = (s) => document.getElementById(s);
+let files = [], canDec = false, cur = null, strText = null;
+
+// Nếu site dùng token thay cookie, thêm header ở đây
+const opt = (m) => ({ method: m || 'GET', credentials: 'include', headers: {} });
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+function show(text) {
+  $('empty').style.display = 'none';
+  const c = $('code'); c.style.display = 'block';
+  c.innerHTML = text.split('\n').map((l, i) => '<div class="ln"><i>' + (i + 1) + '</i><span>' + esc(l) + '</span></div>').join('');
+  c.scrollTop = 0;
+}
+const note = (t) => { $('msg').textContent = t || ''; $('msg').style.display = t ? 'block' : 'none'; };
+
+function build(list) {
+  const root = {};
+  list.forEach((f) => { let n = root; f.path.split('/').forEach((p, i, a) => { n = n[p] = n[p] || (i === a.length - 1 ? { __f: f } : {}); }); });
+  const render = (node, open) => {
+    const box = document.createElement('div');
+    Object.keys(node).sort((a, b) => (!!node[a].__f - !!node[b].__f) || a.localeCompare(b)).forEach((k) => {
+      const v = node[k], row = document.createElement('div'); row.className = 'row';
+      if (v.__f) { row.classList.add('file'); row.textContent = '📄 ' + k; row.onclick = () => openFile(v.__f.path, row); box.append(row); }
+      else {
+        row.classList.add('dir'); row.textContent = '📁 ' + k;
+        const kids = render(v); kids.className = 'kids' + (open ? '' : ' hide');
+        row.onclick = () => kids.classList.toggle('hide'); box.append(row, kids);
+      }
+    });
+    return box;
+  };
+  $('tree').replaceChildren(render(root, list.length < 60));
+}
+
+async function openFile(p, row) {
+  document.querySelectorAll('.row.sel').forEach((r) => r.classList.remove('sel')); row && row.classList.add('sel');
+  cur = p; $('fname').textContent = p; note();
+  const isClass = /\.class$/i.test(p);
+  $('dec').hidden = !isClass;
+  $('dec').textContent = canDec ? 'Decompile' : '🔒 Decompile (gói Pro)';
+  $('dec').disabled = !canDec;
+  const r = await fetch(API + '/file?path=' + encodeURIComponent(p), opt()); const d = await r.json();
+  show(r.ok ? d.text : (d.error || 'Lỗi'));
+}
+
+$('dec').onclick = async () => {
+  if (!cur) return; $('dec').disabled = true; $('dec').textContent = 'Đang decompile…';
+  const r = await fetch(API + '/decompile?path=' + encodeURIComponent(cur), opt('POST')); const d = await r.json();
+  if (r.ok) { show(d.text); note(); } else note(d.error);
+  $('dec').disabled = !canDec; $('dec').textContent = 'Decompile';
+};
+
+$('q').oninput = (e) => {
+  const v = e.target.value.trim().toLowerCase();
+  build(v ? files.filter((f) => f.path.toLowerCase().includes(v)) : files);
+  if (v) document.querySelectorAll('.kids').forEach((k) => k.classList.remove('hide'));
+};
+
+$('tJar').onclick = () => { $('tJar').classList.add('on'); $('tStr').classList.remove('on'); $('dec').hidden = true; cur ? openFile(cur) : ($('code').style.display = 'none', $('empty').style.display = ''); };
+$('tStr').onclick = async () => {
+  $('tStr').classList.add('on'); $('tJar').classList.remove('on'); $('dec').hidden = true; $('fname').textContent = 'Chuỗi trong jar'; note();
+  if (strText == null) { const d = await (await fetch(API + '/strings', opt())).json(); strText = d.text || ''; $('cnt').textContent = d.count; }
+  show(strText);
+};
+
+(async () => {
+  try {
+    const r = await fetch(API + '/tree', opt()); const d = await r.json();
+    if (!r.ok) throw 0;
+    files = d.files; canDec = d.canDecompile;
+    $('title').textContent = d.name; $('size').textContent = files.length + ' file';
+    build(files);
+    fetch(API + '/strings', opt()).then((x) => x.json()).then((s) => { strText = s.text; $('cnt').textContent = s.count; });
+  } catch (_) { $('title').textContent = 'Không mở được file jar'; }
+})();
+</script>
+</body>
+</html>
